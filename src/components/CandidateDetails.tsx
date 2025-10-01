@@ -1,14 +1,14 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  User,
-  Mail,
-  Phone,
-  Briefcase,
-  Calendar,
-  FileText,
-  Clock,
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Briefcase, 
+  Calendar, 
+  FileText, 
+  Clock, 
   IndianRupee,
   MapPin,
   GraduationCap,
@@ -16,7 +16,6 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { Candidate } from './CandidateDropdown';
-import { cn } from '@/lib/utils';
 
 interface CandidateDetailsProps {
   candidate: Candidate | null;
@@ -51,11 +50,11 @@ const getFieldIcon = (fieldName: string) => {
     'Communication Level': <MessageSquare className="h-4 w-4" />,
     'Overall Explanation': <FileText className="h-4 w-4" />
   };
-
+  
   return iconMap[fieldName] || <FileText className="h-4 w-4" />;
 };
 
-const getFieldVariant = (fieldName: string, value: string): "default" | "secondary" | "destructive" | "success" | "warning" => {
+const getFieldVariant = (fieldName: string, value: string) => {
   // Status-based coloring
   if (fieldName.toLowerCase().includes('status')) {
     if (value.toLowerCase().includes('completed') || value.toLowerCase().includes('passed')) {
@@ -68,7 +67,7 @@ const getFieldVariant = (fieldName: string, value: string): "default" | "seconda
       return 'destructive';
     }
   }
-
+  
   // Boolean-like values
   if (value.toLowerCase() === 'yes' || value.toLowerCase() === 'true') {
     return 'success';
@@ -76,7 +75,7 @@ const getFieldVariant = (fieldName: string, value: string): "default" | "seconda
   if (value.toLowerCase() === 'no' || value.toLowerCase() === 'false') {
     return 'secondary';
   }
-
+  
   return 'default';
 };
 
@@ -97,7 +96,7 @@ const formatFieldValue = (fieldName: string, value: string) => {
     }
     return value.includes('₹') ? value : `₹${value}`;
   }
-
+  
   if (fieldName.includes('Date') && value) {
     try {
       const date = new Date(value);
@@ -112,14 +111,14 @@ const formatFieldValue = (fieldName: string, value: string) => {
       // Return original value if date parsing fails
     }
   }
-
+  
   return value;
 };
 
 const isLongTextField = (fieldName: string) => {
   const longTextFields = [
     'Summary',
-    'Transcript',
+    'Transcript', 
     'Overall Explanation',
     'Candidate Intro',
     'Past Experience',
@@ -177,12 +176,12 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidate })
     .sort(([fieldA], [fieldB]) => {
       const indexA = fieldDisplayOrder.indexOf(fieldA);
       const indexB = fieldDisplayOrder.indexOf(fieldB);
-
+      
       // If field is not in order list, put it at the end
       if (indexA === -1 && indexB === -1) return 0;
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
-
+      
       return indexA - indexB;
     });
 
@@ -232,11 +231,11 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidate })
           }
 
           const isLongText = value.toString().length > 100;
-          const formattedValue = formatFieldValue(fieldName, value.toString());
+          const formattedValue = value.toString();
 
           return (
-            <Card
-              key={fieldName}
+            <Card 
+              key={fieldName} 
               className={cn(
                 "p-4 bg-surface border-card-border shadow-sm hover:shadow-md transition-all duration-fast hover:border-border-hover",
                 isLongText && "md:col-span-2 lg:col-span-3"
@@ -251,9 +250,9 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidate })
                     {fieldName}
                   </h4>
                   {fieldName === 'Call Recording' && formattedValue ? (
-                    <a
-                      href={formattedValue}
-                      target="_blank"
+                    <a 
+                      href={formattedValue} 
+                      target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary-dark hover:underline transition-colors"
                     >
@@ -266,7 +265,7 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidate })
                       </p>
                     </div>
                   ) : (
-                    <Badge
+                    <Badge 
                       variant={getFieldVariant(fieldName, value.toString())}
                       className="text-xs"
                     >
@@ -282,3 +281,7 @@ export const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidate })
     </div>
   );
 };
+
+function cn(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
