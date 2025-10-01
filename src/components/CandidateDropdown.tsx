@@ -57,7 +57,7 @@ export const CandidateDropdown: React.FC<CandidateDropdownProps> = ({
           <div className="flex items-center gap-3">
             <User className="h-4 w-4 text-muted-foreground" />
             <span className="text-left">
-              {selectedCandidate
+              {selectedCandidate 
                 ? getDisplayText(selectedCandidate)
                 : "Search candidates..."
               }
@@ -68,8 +68,8 @@ export const CandidateDropdown: React.FC<CandidateDropdownProps> = ({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 shadow-lg border-card-border" side="bottom" align="start">
         <Command className="w-full">
-          <CommandInput
-            placeholder="Search by name or email..."
+          <CommandInput 
+            placeholder="Search by name or email..." 
             className="border-0 focus:ring-0 text-sm"
           />
           <CommandList className="max-h-60 overflow-y-auto">
@@ -78,10 +78,10 @@ export const CandidateDropdown: React.FC<CandidateDropdownProps> = ({
             </CommandEmpty>
             <CommandGroup>
               {uniqueCandidates.map((candidate, index) => {
-                const isSelected = selectedCandidate &&
-                  candidate.Name === selectedCandidate.Name &&
+                const isSelected = selectedCandidate && 
+                  candidate.Name === selectedCandidate.Name && 
                   candidate.Email === selectedCandidate.Email;
-
+                
                 return (
                   <CommandItem
                     key={index}
