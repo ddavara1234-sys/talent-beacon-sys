@@ -8,12 +8,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/hooks/use-toast";
 import { useCandidateData } from "@/hooks/useCandidateData";
+import { useCandidateSelection } from "@/hooks/useCandidateSelection";
 import { createCandidate, updateCandidate, deleteCandidate } from "@/lib/sheetsApi";
+import { CandidateSelectionCard } from "@/components/CandidateSelectionCard";
+import { CandidateSelectionModal } from "@/components/CandidateSelectionModal";
+import type { CandidateSelection } from "@/hooks/useCandidateSelection";
 import { Pencil, Trash2, Plus, RefreshCcw, Loader2 } from "lucide-react";
 
 const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
@@ -57,6 +62,13 @@ const ManageCandidates: React.FC = () => {
     error,
     refetch
   } = useCandidateData();
+  
+  const {
+    data: selectionCandidates = [],
+    isLoading: selectionLoading,
+    refetch: refetchSelection
+  } = useCandidateSelection();
+  
   const [editing, setEditing] = useState<FormValues | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [deleting, setDeleting] = useState<{
@@ -66,6 +78,9 @@ const ManageCandidates: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
   const [deletingPending, setDeletingPending] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
+  const [selectedCandidate, setSelectedCandidate] = useState<CandidateSelection | null>(null);
+  const [processingCandidate, setProcessingCandidate] = useState<string | null>(null);
 
   // SEO
   useEffect(() => {
@@ -197,6 +212,122 @@ const ManageCandidates: React.FC = () => {
       setDeletingPending(false);
     }
   };
+
+  const WEBHOOK_URL = "https://sadfere.app.n8n.cloud/webhook-test/45df636b-5565-4d8c-91fe-80c8af5ac965";
+
+  const handleAcceptCandidate = async (candidate: CandidateSelection) => {
+    setProcessingCandidate(candidate.Email);
+    try {
+      // Send to webhook with Accept type
+      const webhookData = {
+        Name: candidate.Name,
+        "Mobile no": candidate["Mobile no"],
+        Email: candidate.Email,
+        Designation: candidate.Designation,
+        Education: candidate.Education,
+        "Years of relevent experience": candidate["Years of relevent experience"],
+        "Years of total experience": candidate["Years of total experience"],
+        "Experience Type": candidate["Experience Type"],
+        "Technical Score": candidate["Technical Score"],
+        "Experience Score": candidate["Experience Score"],
+        "Achievements Score": candidate["Achievements Score"],
+        "Education Score": candidate["Education Score"],
+        "Overall Score": candidate["Overall Score"],
+        "Current Organization": candidate["Current Organization"],
+        "Projects & Achievements": candidate["Projects & Achievements"],
+        "Job Role Candidate": candidate["Job Role Candidate"],
+        Summary: candidate.Summary,
+        "Quick read": candidate["Quick read"],
+        "Technical skill": candidate["Technical skill"],
+        "Type": "Accept"
+      };
+
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(webhookData)
+      });
+
+      // Add to Candidate Details
+      const newCandidate = {
+        Name: candidate.Name,
+        Email: candidate.Email,
+        "Phone Number": candidate["Mobile no"],
+        "Job Role Admin": candidate["Job Role Candidate"],
+        Datetime: formatDateTime()
+      };
+
+      await createCandidate(newCandidate);
+
+      toast({
+        title: "Candidate accepted",
+        description: `${candidate.Name} has been added to Candidate Details.`
+      });
+
+      setSelectedCandidate(null);
+      refetchSelection();
+      refetch();
+    } catch (e: any) {
+      toast({
+        title: "Failed to accept candidate",
+        description: e.message || String(e),
+        variant: "destructive"
+      });
+    } finally {
+      setProcessingCandidate(null);
+    }
+  };
+
+  const handleRejectCandidate = async (candidate: CandidateSelection) => {
+    setProcessingCandidate(candidate.Email);
+    try {
+      // Send to webhook with Reject type
+      const webhookData = {
+        Name: candidate.Name,
+        "Mobile no": candidate["Mobile no"],
+        Email: candidate.Email,
+        Designation: candidate.Designation,
+        Education: candidate.Education,
+        "Years of relevent experience": candidate["Years of relevent experience"],
+        "Years of total experience": candidate["Years of total experience"],
+        "Experience Type": candidate["Experience Type"],
+        "Technical Score": candidate["Technical Score"],
+        "Experience Score": candidate["Experience Score"],
+        "Achievements Score": candidate["Achievements Score"],
+        "Education Score": candidate["Education Score"],
+        "Overall Score": candidate["Overall Score"],
+        "Current Organization": candidate["Current Organization"],
+        "Projects & Achievements": candidate["Projects & Achievements"],
+        "Job Role Candidate": candidate["Job Role Candidate"],
+        Summary: candidate.Summary,
+        "Quick read": candidate["Quick read"],
+        "Technical skill": candidate["Technical skill"],
+        "Type": "Reject"
+      };
+
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(webhookData)
+      });
+
+      toast({
+        title: "Candidate rejected",
+        description: `${candidate.Name} has been removed from selection.`
+      });
+
+      setSelectedCandidate(null);
+      refetchSelection();
+    } catch (e: any) {
+      toast({
+        title: "Failed to reject candidate",
+        description: e.message || String(e),
+        variant: "destructive"
+      });
+    } finally {
+      setProcessingCandidate(null);
+    }
+  };
   return <div className="min-h-screen bg-background">
       <NavBar />
       <main className="container mx-auto max-w-7xl px-4 py-6 space-y-8">
@@ -208,10 +339,13 @@ const ManageCandidates: React.FC = () => {
               variant="outline"
               size="sm"
               className="gap-2"
-              onClick={() => refetch()}
-              disabled={loading}
+              onClick={() => {
+                refetch();
+                refetchSelection();
+              }}
+              disabled={loading || selectionLoading}
             >
-              {loading ? (
+              {(loading || selectionLoading) ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> Loading...
                 </>
@@ -283,12 +417,26 @@ const ManageCandidates: React.FC = () => {
           </Form>
         </Card>
 
-        {/* Table Section */}
+        {/* Tabs Section */}
         <Card className="p-0 bg-surface border-card-border shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-card-border">
-            <h2 className="text-lg font-medium text-foreground">Candidate Details</h2>
-          </div>
-          <div className="relative w-full overflow-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="p-4 border-b border-card-border">
+              <TabsList className="w-full justify-start">
+                <TabsTrigger value="details">Candidate Details</TabsTrigger>
+                <TabsTrigger value="selection">
+                  Candidate Selection
+                  {selectionCandidates.length > 0 && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-xs">
+                      {selectionCandidates.length}
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            {/* Candidate Details Tab */}
+            <TabsContent value="details" className="m-0">
+              <div className="relative w-full overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -397,8 +545,52 @@ const ManageCandidates: React.FC = () => {
               </TableBody>
             </Table>
           </div>
+            </TabsContent>
+
+            {/* Candidate Selection Tab */}
+            <TabsContent value="selection" className="m-0">
+              <div className="p-6">
+                {selectionLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <Card key={i} className="p-6">
+                        <Skeleton className="h-48 w-full" />
+                      </Card>
+                    ))}
+                  </div>
+                ) : selectionCandidates.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    No candidates in selection queue.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectionCandidates.map((candidate, idx) => (
+                      <CandidateSelectionCard
+                        key={idx}
+                        candidate={candidate}
+                        onAccept={handleAcceptCandidate}
+                        onReject={handleRejectCandidate}
+                        onClick={setSelectedCandidate}
+                        isProcessing={processingCandidate === candidate.Email}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </Card>
       </main>
+
+      {/* Candidate Selection Modal */}
+      <CandidateSelectionModal
+        candidate={selectedCandidate}
+        open={!!selectedCandidate}
+        onClose={() => setSelectedCandidate(null)}
+        onAccept={handleAcceptCandidate}
+        onReject={handleRejectCandidate}
+        isProcessing={processingCandidate === selectedCandidate?.Email}
+      />
     </div>;
 };
 const EditForm: React.FC<{
