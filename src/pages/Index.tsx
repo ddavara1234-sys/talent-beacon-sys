@@ -6,6 +6,8 @@ import { useCandidateData } from '@/hooks/useCandidateData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Users, UserCheck, Clock } from 'lucide-react';
 
+// HR Dashboard Homepage
+
 const Index = () => {
   const { candidates, loading, error } = useCandidateData();
   const [selectedCandidate, setSelectedCandidate] = React.useState<Candidate | null>(null);
