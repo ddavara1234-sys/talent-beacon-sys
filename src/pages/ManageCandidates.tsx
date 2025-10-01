@@ -216,11 +216,12 @@ const ManageCandidates: React.FC = () => {
   const WEBHOOK_URL = "https://sadfere.app.n8n.cloud/webhook-test/45df636b-5565-4d8c-91fe-80c8af5ac965";
 
   const handleAcceptCandidate = async (candidate: CandidateSelection) => {
+    const candidateName = candidate["Name "]?.trim() || "Unknown";
     setProcessingCandidate(candidate.Email);
     try {
       // Send to webhook with Accept type
       const webhookData = {
-        Name: candidate.Name,
+        "Name ": candidateName,
         "Mobile no": candidate["Mobile no"],
         Email: candidate.Email,
         Designation: candidate.Designation,
@@ -232,11 +233,11 @@ const ManageCandidates: React.FC = () => {
         "Experience Score": candidate["Experience Score"],
         "Achievements Score": candidate["Achievements Score"],
         "Education Score": candidate["Education Score"],
-        "Overall Score": candidate["Overall Score"],
-        "Current Organization": candidate["Current Organization"],
-        "Projects & Achievements": candidate["Projects & Achievements"],
+        "Overall Score ": candidate["Overall Score "],
+        "Current Organization\n": candidate["Current Organization\n"],
+        "Projects & Achievements\n": candidate["Projects & Achievements\n"],
         "Job Role Candidate": candidate["Job Role Candidate"],
-        Summary: candidate.Summary,
+        Summry: candidate.Summry,
         "Quick read": candidate["Quick read"],
         "Technical skill": candidate["Technical skill"],
         "Type": "Accept"
@@ -250,9 +251,9 @@ const ManageCandidates: React.FC = () => {
 
       // Add to Candidate Details
       const newCandidate = {
-        Name: candidate.Name,
+        Name: candidateName,
         Email: candidate.Email,
-        "Phone Number": candidate["Mobile no"],
+        "Phone Number": String(candidate["Mobile no"]),
         "Job Role Admin": candidate["Job Role Candidate"],
         Datetime: formatDateTime()
       };
@@ -260,13 +261,14 @@ const ManageCandidates: React.FC = () => {
       await createCandidate(newCandidate);
 
       toast({
-        title: "Candidate accepted",
-        description: `${candidate.Name} has been added to Candidate Details.`
+        title: "Candidate accepted ✓",
+        description: `${candidateName} has been added to Candidate Details.`
       });
 
       setSelectedCandidate(null);
-      refetchSelection();
-      refetch();
+      // Refetch to update the list and remove the accepted candidate
+      await refetchSelection();
+      await refetch();
     } catch (e: any) {
       toast({
         title: "Failed to accept candidate",
@@ -279,11 +281,12 @@ const ManageCandidates: React.FC = () => {
   };
 
   const handleRejectCandidate = async (candidate: CandidateSelection) => {
+    const candidateName = candidate["Name "]?.trim() || "Unknown";
     setProcessingCandidate(candidate.Email);
     try {
       // Send to webhook with Reject type
       const webhookData = {
-        Name: candidate.Name,
+        "Name ": candidateName,
         "Mobile no": candidate["Mobile no"],
         Email: candidate.Email,
         Designation: candidate.Designation,
@@ -295,11 +298,11 @@ const ManageCandidates: React.FC = () => {
         "Experience Score": candidate["Experience Score"],
         "Achievements Score": candidate["Achievements Score"],
         "Education Score": candidate["Education Score"],
-        "Overall Score": candidate["Overall Score"],
-        "Current Organization": candidate["Current Organization"],
-        "Projects & Achievements": candidate["Projects & Achievements"],
+        "Overall Score ": candidate["Overall Score "],
+        "Current Organization\n": candidate["Current Organization\n"],
+        "Projects & Achievements\n": candidate["Projects & Achievements\n"],
         "Job Role Candidate": candidate["Job Role Candidate"],
-        Summary: candidate.Summary,
+        Summry: candidate.Summry,
         "Quick read": candidate["Quick read"],
         "Technical skill": candidate["Technical skill"],
         "Type": "Reject"
@@ -312,12 +315,13 @@ const ManageCandidates: React.FC = () => {
       });
 
       toast({
-        title: "Candidate rejected",
-        description: `${candidate.Name} has been removed from selection.`
+        title: "Candidate rejected ✕",
+        description: `${candidateName} has been removed from selection.`
       });
 
       setSelectedCandidate(null);
-      refetchSelection();
+      // Refetch to update the list and remove the rejected candidate
+      await refetchSelection();
     } catch (e: any) {
       toast({
         title: "Failed to reject candidate",

@@ -25,11 +25,12 @@ export const CandidateSelectionModal: React.FC<CandidateSelectionModalProps> = (
 }) => {
   if (!candidate) return null;
 
-  const technicalScore = candidate["Technical Score"] || "0";
-  const experienceScore = candidate["Experience Score"] || "0";
-  const achievementsScore = candidate["Achievements Score"] || "0";
-  const educationScore = candidate["Education Score"] || "0";
-  const overallScore = candidate["Overall Score"] || "0";
+  const name = candidate["Name "]?.trim() || "Unknown";
+  const technicalScore = candidate["Technical Score"] || 0;
+  const experienceScore = candidate["Experience Score"] || 0;
+  const achievementsScore = candidate["Achievements Score"] || 0;
+  const educationScore = candidate["Education Score"] || 0;
+  const overallScore = candidate["Overall Score "] || 0;
   
   const skills = candidate["Technical skill"]?.split(',').map(s => s.trim()).filter(Boolean) || [];
 
@@ -40,7 +41,7 @@ export const CandidateSelectionModal: React.FC<CandidateSelectionModalProps> = (
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
               <User className="h-6 w-6" />
-              {candidate.Name}
+              {name}
             </DialogTitle>
           </div>
         </DialogHeader>
@@ -65,7 +66,7 @@ export const CandidateSelectionModal: React.FC<CandidateSelectionModalProps> = (
                 </div>
                 <div>
                   <span className="text-muted-foreground">Current Organization:</span>{' '}
-                  <span className="text-foreground font-medium">{candidate["Current Organization"]}</span>
+                  <span className="text-foreground font-medium">{candidate["Current Organization\n"]?.trim() || "Not Mentioned"}</span>
                 </div>
               </div>
             </Card>
@@ -83,7 +84,7 @@ export const CandidateSelectionModal: React.FC<CandidateSelectionModalProps> = (
                 </div>
                 <div>
                   <span className="text-muted-foreground">Mobile:</span>{' '}
-                  <span className="text-foreground font-medium">{candidate["Mobile no"]}</span>
+                  <span className="text-foreground font-medium">{String(candidate["Mobile no"])}</span>
                 </div>
               </div>
             </Card>
@@ -177,24 +178,24 @@ export const CandidateSelectionModal: React.FC<CandidateSelectionModalProps> = (
           )}
 
           {/* Projects & Achievements */}
-          {candidate["Projects & Achievements"] && (
+          {candidate["Projects & Achievements\n"] && (
             <Card className="p-4 bg-surface">
               <div className="flex items-center gap-2 mb-3">
                 <Award className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold text-foreground">Projects & Achievements</h3>
               </div>
-              <p className="text-sm text-muted-foreground">{candidate["Projects & Achievements"]}</p>
+              <p className="text-sm text-muted-foreground">{candidate["Projects & Achievements\n"]}</p>
             </Card>
           )}
 
           {/* Summary */}
-          {candidate.Summary && (
+          {candidate.Summry && (
             <Card className="p-4 bg-surface">
               <div className="flex items-center gap-2 mb-3">
                 <BookOpen className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold text-foreground">Summary</h3>
               </div>
-              <p className="text-sm text-muted-foreground">{candidate.Summary}</p>
+              <p className="text-sm text-muted-foreground">{candidate.Summry}</p>
             </Card>
           )}
 

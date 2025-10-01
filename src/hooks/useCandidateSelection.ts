@@ -2,23 +2,23 @@ import { useQuery } from '@tanstack/react-query';
 import Papa from 'papaparse';
 
 export interface CandidateSelection {
-  Name: string;
-  "Mobile no": string;
+  "Name ": string;
+  "Mobile no": number | string;
   Email: string;
   Designation: string;
   Education: string;
   "Years of relevent experience": string;
   "Years of total experience": string;
   "Experience Type": string;
-  "Technical Score": string;
-  "Experience Score": string;
-  "Achievements Score": string;
-  "Education Score": string;
-  "Overall Score": string;
-  "Current Organization": string;
-  "Projects & Achievements": string;
+  "Technical Score": number;
+  "Experience Score": number;
+  "Achievements Score": number;
+  "Education Score": number;
+  "Overall Score ": number;
+  "Current Organization\n": string;
+  "Projects & Achievements\n": string;
   "Job Role Candidate": string;
-  Summary: string;
+  Summry: string;
   "Quick read": string;
   "Technical skill": string;
 }
