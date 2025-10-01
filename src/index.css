@@ -4,10 +4,6 @@
 
 /* Professional Dashboard Design System - Light, Clean, Modern */
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
     /* Background & Surface Colors */
@@ -48,11 +44,11 @@ All colors MUST be HSL.
     --success: 145 65% 50%;
     --success-foreground: 0 0% 100%;
     --success-light: 145 65% 95%;
-
+    
     --warning: 35 100% 55%;
     --warning-foreground: 0 0% 100%;
     --warning-light: 35 100% 95%;
-
+    
     --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 100%;
     --destructive-light: 0 75% 95%;
@@ -73,9 +69,9 @@ All colors MUST be HSL.
     /* Animations & Transitions */
     --transition-fast: 0.15s ease-out;
     --transition-normal: 0.25s ease-out;
-    --transition-slow: 0.35s ease-out%;
+    --transition-slow: 0.35s ease-out;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
