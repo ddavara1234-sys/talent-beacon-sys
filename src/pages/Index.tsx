@@ -1,47 +1,42 @@
-import React from 'react';
-import NavBar from '@/components/NavBar';
+import React, { useState } from 'react';
 import { CandidateDropdown, Candidate } from '@/components/CandidateDropdown';
 import { CandidateDetails } from '@/components/CandidateDetails';
 import { useCandidateData } from '@/hooks/useCandidateData';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Users, UserCheck, Clock } from 'lucide-react';
-
-// HR Dashboard Homepage
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, Database, Users, AlertCircle, Loader2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import NavBar from '@/components/NavBar';
 
 const Index = () => {
-  const { candidates, loading, error } = useCandidateData();
-  const [selectedCandidate, setSelectedCandidate] = React.useState<Candidate | null>(null);
+  const { candidates, loading, error, refetch } = useCandidateData();
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
 
-  const stats = React.useMemo(() => {
-    const total = candidates.length;
-    const interviewed = candidates.filter((c: any) => c['Interview Status'] === 'Completed').length;
-    const pending = candidates.filter((c: any) => c['Interview Status'] === 'Scheduled').length;
-    
-    return { total, interviewed, pending };
-  }, [candidates]);
+  const handleRefresh = () => {
+    refetch();
+    toast({
+      title: "Data Refreshed",
+      description: "Candidate data has been reloaded from the source.",
+    });
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <NavBar />
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <div className="text-center space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-            <p className="text-muted-foreground">Loading candidate data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <NavBar />
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <div className="text-center space-y-4">
-            <p className="text-destructive font-semibold">Error loading data</p>
-            <p className="text-muted-foreground">{error}</p>
+        <div className="container mx-auto p-6">
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <Card className="p-8 bg-surface border-card-border shadow-sm max-w-md">
+              <div className="text-center">
+                <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                <h2 className="text-lg font-medium text-foreground mb-2">Failed to Load Data</h2>
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <Button onClick={handleRefresh} variant="outline" className="gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Try Again
+                </Button>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -51,80 +46,67 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <NavBar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
-          {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">HR Dashboard</h1>
-            <p className="text-muted-foreground">Manage and track candidate interviews</p>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Candidates</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Interviewed</CardTitle>
-                <UserCheck className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.interviewed}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.pending}</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Candidate Selection */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle>Select Candidate</CardTitle>
-                <CardDescription>Choose a candidate to view details</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <CandidateDropdown
-                  candidates={candidates}
-                  onSelectCandidate={setSelectedCandidate}
-                  selectedCandidate={selectedCandidate}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Candidate Details */}
-            <div className="lg:col-span-2">
-              {selectedCandidate ? (
-                <CandidateDetails candidate={selectedCandidate} />
-              ) : (
-                <Card className="h-full">
-                  <CardContent className="flex items-center justify-center h-full min-h-[400px]">
-                    <div className="text-center space-y-2">
-                      <Users className="h-12 w-12 text-muted-foreground mx-auto" />
-                      <p className="text-muted-foreground">
-                        Select a candidate to view their details
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+      <div className="container mx-auto p-6 max-w-7xl">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Candidate Dashboard
+              </h1>
+              <p className="text-muted-foreground">
+                Search and view candidate information from the live database
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>{candidates.length} candidates</span>
+              </div>
+              <Button 
+                onClick={handleRefresh} 
+                variant="outline" 
+                size="sm"
+                className="gap-2"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    Refresh
+                  </>
+                )}
+              </Button>
             </div>
           </div>
+        </div>
+
+        {/* Search Section */}
+        <div className="mb-8">
+          <Card className="p-6 bg-surface border-card-border shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <Database className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-medium text-foreground">
+                Select Candidate
+              </h2>
+            </div>
+            <CandidateDropdown
+              candidates={candidates}
+              selectedCandidate={selectedCandidate}
+              onSelectCandidate={setSelectedCandidate}
+            />
+          </Card>
+        </div>
+
+        {/* Details Section */}
+        <div className="mb-8">
+          <CandidateDetails candidate={selectedCandidate} />
         </div>
       </div>
     </div>
@@ -132,3 +114,4 @@ const Index = () => {
 };
 
 export default Index;
+
